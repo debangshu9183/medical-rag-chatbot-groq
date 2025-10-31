@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🩺 Medical Chatbot</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f8; padding: 20px; }
+        .chat-box { background: white; border-radius: 10px; padding: 20px; width: 60%; margin: auto; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .user { color: #0078D7; font-weight: bold; margin-top: 10px; }
+        .assistant { color: #333; margin-bottom: 10px; }
+        input { width: 80%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
+        button { padding: 10px 15px; background: #0078D7; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="chat-box">
+        <h2>🩺 Medical Assistant Chatbot</h2>
+        <div id="chat">
+            {% for msg in chat_history %}
+                <div class="{{ msg.role }}">{{ msg.role.capitalize() }}: {{ msg.content }}</div>
+            {% endfor %}
+        </div>
+        <br>
+        <input type="text" id="user_input" placeholder="Ask a medical question..." />
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        async function sendMessage() {
+            const question = document.getElementById("user_input").value;
+            const chat = document.getElementById("chat");
+
+            chat.innerHTML += `<div class='user'>You: ${question}</div>`;
+            document.getElementById("user_input").value = "";
+
+            const response = await fetch("/ask", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ question })
+            });
+
+            const data = await response.json();
+            chat.innerHTML += `<div class='assistant'>Bot: ${data.answer}</div>`;
+        }
+    </script>
+</body>
+</html>
